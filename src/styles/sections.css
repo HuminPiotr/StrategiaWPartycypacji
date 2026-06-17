@@ -750,6 +750,7 @@
   border: 0;
   padding: 0.7rem 0.5rem;
   text-align: left;
+  margin-left: -10px;
 }
 .when__dot-mark {
   width: 18px;
