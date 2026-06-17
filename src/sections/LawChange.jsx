@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { lawShift, sections } from '../data/content.js'
 import SectionShell from '../components/SectionShell.jsx'
 
@@ -21,15 +21,52 @@ export default function LawChange() {
   // Suwak steruje „odsłonięciem” kolumny TERAZ nad kolumną KIEDYŚ (wipe).
   // Obie kolumny są w DOM → dostępne dla czytników niezależnie od suwaka.
   const [split, setSplit] = useState(55)
+  const draggingRef = useRef(false)
+
+  // Wipe działa tylko, gdy kolumny są nałożone (≥ 560px). Na wąskich ekranach
+  // kolumny stackują się i przeciąganie nie ma sensu — nie przejmujemy scrolla.
+  const isWipeActive = () =>
+    typeof window !== 'undefined' && !window.matchMedia('(max-width: 560px)').matches
+
+  const setFromClientX = (clientX, el) => {
+    const rect = el.getBoundingClientRect()
+    if (!rect.width) return
+    const pct = ((clientX - rect.left) / rect.width) * 100
+    setSplit(Math.min(100, Math.max(0, pct)))
+  }
+
+  const handlePointerDown = (e) => {
+    if (!isWipeActive()) return
+    draggingRef.current = true
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+    setFromClientX(e.clientX, e.currentTarget)
+  }
+  const handlePointerMove = (e) => {
+    if (!draggingRef.current) return
+    setFromClientX(e.clientX, e.currentTarget)
+  }
+  const endDrag = (e) => {
+    draggingRef.current = false
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    }
+  }
 
   return (
     <SectionShell id="law" n={s.n} label={s.label} className="law-section">
       <h2 data-reveal>Co zmieniło prawo?</h2>
       <p className="lead section__intro" data-reveal>
-        Przesuń suwak od „kiedyś” do „teraz”. To samo zadanie — inne reguły gry.
+        Chwyć linię i przeciągnij — od „kiedyś” do „teraz”. To samo zadanie, inne reguły gry.
       </p>
 
-      <div className="law__compare" data-reveal>
+      <div
+        className="law__compare"
+        data-reveal
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+      >
         <div className="law__pane law__pane--before" aria-hidden="false">
           <Column data={lawShift.before} accent="ink-soft" />
         </div>
@@ -40,8 +77,10 @@ export default function LawChange() {
           <Column data={lawShift.after} accent="navy" />
         </div>
         <div className="law__handle" style={{ left: `${split}%` }} aria-hidden="true">
-          <span className="law__handle-line" />
-          <span className="law__handle-grip">↔</span>
+          <span className="law__handle-grip">
+            <span className="law__handle-arrow">‹</span>
+            <span className="law__handle-arrow">›</span>
+          </span>
         </div>
       </div>
 

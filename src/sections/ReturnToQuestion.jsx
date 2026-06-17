@@ -73,7 +73,13 @@ export default function ReturnToQuestion() {
           )}
         </fieldset>
 
-        <ScrubText as="p" className="return__punchline" text={ending.punchline} end="bottom 70%" />
+        <ScrubText
+          as="p"
+          className="return__punchline"
+          text={ending.punchline}
+          start="top 85%"
+          end="top 55%"
+        />
       </div>
     </section>
   )

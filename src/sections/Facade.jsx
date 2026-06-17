@@ -60,16 +60,16 @@ export default function Facade() {
 
       <div className="facade__signals" data-reveal>
         <h3 className="facade__signals-title">Sygnały ostrzegawcze</h3>
-        <ul className="facade__signals-list">
+        <ol className="facade__signals-list">
           {facadeSignals.map((sig, i) => (
-            <li key={i}>
-              <span className="facade__signal-mark" aria-hidden="true">
-                !
+            <li key={i} className="facade__signal">
+              <span className="facade__signal-num" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
               </span>
-              {sig}
+              <span className="facade__signal-text">{sig}</span>
             </li>
           ))}
-        </ul>
+        </ol>
       </div>
     </SectionShell>
   )

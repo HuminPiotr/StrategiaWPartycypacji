@@ -497,6 +497,11 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--paper-2);
+  /* cały obszar jest chwytalny jak before/after slider */
+  cursor: col-resize;
+  touch-action: pan-y; /* pozwól pionowemu scrollowi strony przejść przez widget */
+  user-select: none;
+  -webkit-user-select: none;
 }
 .law__pane {
   grid-area: 1 / 1;
@@ -540,27 +545,52 @@
   background: var(--navy);
   transform: translateX(-1px);
   pointer-events: none;
+  /* szew: subtelna głębia po obu stronach linii podziału */
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--paper) 60%, transparent),
+    0 0 18px rgba(30, 58, 95, 0.25);
 }
 .law__handle-grip {
   position: absolute;
-  top: 1rem;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  background: var(--navy);
-  color: var(--paper);
-  width: 30px;
-  height: 30px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.12em;
+  width: 42px;
+  height: 42px;
   border-radius: 99px;
-  display: grid;
-  place-items: center;
-  font-size: 0.9rem;
+  background: var(--paper);
+  border: 2px solid var(--navy);
+  color: var(--navy);
+  box-shadow: var(--shadow-md);
+  transition:
+    transform 0.4s var(--ease),
+    box-shadow 0.4s var(--ease);
+}
+.law__handle-arrow {
+  font-size: 1.05rem;
+  line-height: 1;
+  font-weight: 700;
+}
+/* hover physics: grip reaguje na najechanie/chwyt całego widgetu */
+.law__compare:hover .law__handle-grip {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: var(--shadow-lg);
+}
+.law__compare:active .law__handle-grip {
+  transform: translate(-50%, -50%) scale(0.96);
 }
 .law__slider-label {
   display: block;
-  margin-top: 1rem;
+  margin-top: 1.2rem;
 }
 .law__slider {
   width: 100%;
+  accent-color: var(--navy);
+  cursor: pointer;
 }
 .law__note {
   margin-top: 1.5rem;
@@ -902,30 +932,84 @@
 }
 .facade__signals {
   border-left: 4px solid var(--coral);
-  padding-left: clamp(1rem, 3vw, 2rem);
+  padding-left: clamp(1.2rem, 3.5vw, 2.6rem);
 }
 .facade__signals-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
   color: var(--coral);
-  margin-bottom: 1.2rem;
+  margin-bottom: clamp(1.6rem, 4vw, 2.6rem);
 }
 .facade__signals-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 0.8rem 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: clamp(1.3rem, 3vw, 2rem) clamp(1.6rem, 4vw, 2.8rem);
 }
-.facade__signals-list li {
-  display: flex;
-  gap: 0.7em;
-  color: var(--ink);
-  font-size: 0.96rem;
+.facade__signal {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 0.85rem;
 }
-.facade__signal-mark {
+.facade__signal-num {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
   color: var(--coral);
-  font-weight: 800;
-  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.facade__signal-text {
+  font-size: 1.04rem;
+  line-height: 1.45;
+  color: var(--ink);
+  font-weight: 600;
 }
 
 /* — SEKCJA 09: Ratio — */
+/* „nie istnieje” odsłania się dopiero po interakcji z suwakami.
+   Język ze strony: wipe + sekwencyjne rozjaśnianie słów z blur→0 (jak ScrubText).
+   - max-width: 0 → nie rezerwuje miejsca (brak pustej 2. linii nagłówka),
+   - clip-path chowa przepełnienie zamiast overflow:hidden, które na inline-block
+     przesuwa baseline na dolną krawędź i rozjeżdża nagłówek. */
+.ratio__reveal {
+  display: inline-block;
+  vertical-align: baseline;
+  white-space: nowrap;
+  max-width: 0;
+  clip-path: inset(0 100% 0 0);
+  transition:
+    max-width 0.7s var(--ease-out-expo),
+    clip-path 0.7s var(--ease-out-expo);
+}
+.ratio__reveal.is-shown {
+  max-width: 12ch;
+  clip-path: inset(0 0 0 0);
+}
+.ratio__reveal-word {
+  display: inline-block;
+  color: var(--ink);
+  opacity: 0.12;
+  filter: blur(6px);
+  transition:
+    opacity 0.55s var(--ease-out-expo),
+    filter 0.55s var(--ease-out-expo);
+  transition-delay: calc(var(--i, 0) * 0.1s);
+}
+.ratio__reveal.is-shown .ratio__reveal-word {
+  opacity: 1;
+  filter: blur(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ratio__reveal,
+  .ratio__reveal-word {
+    transition: none;
+  }
+}
 .ratio__panel {
   display: grid;
   gap: clamp(1.5rem, 4vw, 2.5rem);
@@ -984,6 +1068,11 @@
 }
 
 /* — SEKCJA 10: Return — */
+/* Rozbieg scrolla pod treścią: scrub puenty potrzebuje miejsca, by dojechać
+   do końca na każdej wysokości ekranu (sekcja jest ostatnia przed footerem). */
+.return-section {
+  padding-bottom: clamp(5rem, 28vh, 16rem);
+}
 .return__inner {
   display: flex;
   flex-direction: column;
@@ -1061,6 +1150,11 @@
   .law__compare {
     /* na wąskich ekranach pokaż obie kolumny pod sobą zamiast wipe */
     background: var(--paper);
+    /* przywróć normalne zachowanie — brak drag/przejmowania scrolla */
+    cursor: auto;
+    touch-action: auto;
+    user-select: auto;
+    -webkit-user-select: auto;
   }
   .law__pane {
     grid-area: auto;
