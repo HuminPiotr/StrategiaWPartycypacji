@@ -1032,7 +1032,7 @@
 
 /* — Scrub tekstu: słowa rozjaśniane scrollem — */
 .scrub__word {
-  display: inline;
+  display: inline-block;
 }
 
 /* — Responsywność — */
