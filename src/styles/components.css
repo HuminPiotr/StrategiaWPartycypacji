@@ -1,0 +1,160 @@
+/* Style komponentów reużywalnych. Namespacing per komponent — bez konfliktów specyficzności. */
+
+/* — SectionShell — */
+.shell__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  padding: 0.5em 0.95em;
+  border: 1px solid var(--hairline);
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--paper) 60%, transparent);
+  box-shadow: var(--hi-inset);
+  backdrop-filter: blur(4px);
+}
+.shell--dark .shell__eyebrow {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: none;
+}
+.shell__sep {
+  opacity: 0.4;
+}
+.shell__n {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  font-weight: 700;
+}
+.shell--dark {
+  background: var(--ink-bg);
+  color: var(--on-ink);
+}
+.shell--dark .eyebrow,
+.shell--dark .shell__n {
+  color: var(--on-ink-soft);
+}
+.shell--dark .shell__n {
+  color: var(--on-ink);
+}
+.shell--dark .lead {
+  color: var(--on-ink-soft);
+}
+.shell--full {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+}
+
+/* — TensionMeter — */
+.meter {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+.meter__bar {
+  display: flex;
+  width: 100%;
+  height: 8px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: var(--hairline);
+}
+.meter--md .meter__bar {
+  height: 14px;
+}
+.meter--lg .meter__bar {
+  height: 22px;
+}
+.meter__seg {
+  display: block;
+  flex-basis: 0;
+  transition: flex-grow 0.4s var(--ease);
+  min-width: 2px;
+}
+.meter__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  font-size: var(--step-caption);
+  color: var(--ink-soft);
+}
+.meter__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+.meter__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 99px;
+  display: inline-block;
+}
+
+/* — Chip — */
+.chip {
+  --chip-accent: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.6em 1.05em;
+  border: 1.5px solid var(--hairline);
+  border-radius: 99px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.2;
+  transition:
+    border-color 0.2s var(--ease),
+    background 0.2s var(--ease),
+    color 0.2s var(--ease),
+    transform 0.1s var(--ease);
+  text-align: left;
+}
+.chip {
+  transition:
+    border-color 0.4s var(--ease),
+    background 0.4s var(--ease),
+    color 0.4s var(--ease),
+    box-shadow 0.4s var(--ease),
+    transform 0.5s var(--ease);
+}
+.chip:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+.chip:active {
+  transform: scale(0.97);
+}
+.chip--active {
+  background: var(--chip-accent);
+  border-color: var(--chip-accent);
+  color: var(--paper);
+}
+
+/* — VoiceTag — */
+.voice-tag {
+  color: var(--ink-soft);
+  font-size: 0.95em;
+}
+.shell--dark .voice-tag {
+  color: var(--on-ink-soft);
+}
+
+/* — Wspólna karta / panel — miękki, „machined” wygląd (warstwowy cień + inset highlight) — */
+.card {
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.1rem, 2.5vw, 1.6rem);
+  box-shadow: var(--shadow-md), var(--hi-inset);
+}
+.shell--dark .card {
+  background: #26261f;
+  border-color: #3a3a30;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}

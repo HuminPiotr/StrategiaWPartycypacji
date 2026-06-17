@@ -1,0 +1,55 @@
+/* Tokeny projektu — patrz DESIGN.md §2, §3 */
+:root {
+  /* — Kolory — */
+  --paper: #f5f3ee;
+  --paper-2: #ece9e1;
+  --ink: #1c1c1a;
+  --ink-soft: #55524b;
+  --navy: #1e3a5f; /* akcent 1 — eksperci / dane / instytucja */
+  --olive: #5c6b3c; /* akcent 2 — mieszkańcy / proces wspólnotowy */
+  --coral: #c04a2b; /* akcent 3 — spór / ostrzeżenie / fasada */
+  --hairline: #d8d4ca;
+
+  /* warianty tła ciemnego (Sekcja 4) */
+  --ink-bg: #1c1c1a;
+  --on-ink: #f0ede5;
+  --on-ink-soft: #a8a399;
+
+  /* — Typografia — */
+  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-body: 'Inter Variable', system-ui, sans-serif;
+  --font-voice: 'Newsreader Variable', Georgia, serif;
+
+  --step-h1: clamp(2.4rem, 7vw, 5.5rem);
+  --step-h2: clamp(1.9rem, 4.5vw, 3.25rem);
+  --step-h3: clamp(1.3rem, 2.6vw, 1.8rem);
+  --step-lead: clamp(1.05rem, 2vw, 1.4rem);
+  --step-quote: clamp(1.2rem, 2.6vw, 1.9rem);
+  --step-body: 1rem;
+  --step-caption: 0.8rem;
+
+  /* — Rytm / layout — */
+  --container: 1180px;
+  --gap: clamp(1rem, 2.5vw, 2rem);
+  --section-pad: clamp(4rem, 10vh, 8rem);
+  --radius: 4px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
+
+  /* — Ruch: sprężyste, „masowe” krzywe (nie linear/ease-in-out) — */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* — Miękkie, rozproszone cienie (warstwowe, nie twarde) — */
+  --shadow-sm: 0 1px 2px rgba(28, 28, 26, 0.04), 0 2px 6px rgba(28, 28, 26, 0.04);
+  --shadow-md:
+    0 2px 4px rgba(28, 28, 26, 0.03),
+    0 8px 18px rgba(28, 28, 26, 0.05),
+    0 18px 40px rgba(28, 28, 26, 0.05);
+  --shadow-lg:
+    0 4px 8px rgba(28, 28, 26, 0.04),
+    0 16px 32px rgba(28, 28, 26, 0.06),
+    0 32px 64px rgba(28, 28, 26, 0.08);
+  --hi-inset: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}

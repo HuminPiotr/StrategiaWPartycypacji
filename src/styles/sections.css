@@ -1,0 +1,1081 @@
+/* Style sekcji. Klasy namespace'owane per sekcja, by uniknąć konfliktów specyficzności. */
+
+/* — Globalne pomocnicze — */
+.section__intro {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 100;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: top 0.2s var(--ease);
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+.progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 90;
+  background: transparent;
+  pointer-events: none;
+}
+.progress__fill {
+  height: 100%;
+  background: var(--coral);
+  transform-origin: left;
+  width: 100%;
+}
+
+.site-footer {
+  background: var(--ink-bg);
+  color: var(--on-ink-soft);
+  padding-block: clamp(2.5rem, 6vw, 4rem);
+  font-size: var(--step-caption);
+}
+.site-footer p {
+  max-width: 60ch;
+}
+
+/* — Wspólny styl opcji sondażu (Hero + Return) — */
+.poll-option {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  width: 100%;
+  text-align: left;
+  padding: 0.85em 1.1em;
+  border: 1.5px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  transition:
+    border-color 0.18s var(--ease),
+    background 0.18s var(--ease),
+    transform 0.1s var(--ease);
+}
+.poll-option {
+  transition:
+    border-color 0.4s var(--ease),
+    background 0.4s var(--ease),
+    transform 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+.poll-option:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+.poll-option:active {
+  transform: scale(0.99);
+}
+.poll-option__dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 99px;
+  border: 2px solid var(--ink-soft);
+  flex-shrink: 0;
+  transition: all 0.18s var(--ease);
+}
+.poll-option--active {
+  border-color: var(--navy);
+  background: color-mix(in srgb, var(--navy) 8%, var(--paper));
+}
+.poll-option--active .poll-option__dot {
+  border-color: var(--navy);
+  background: var(--navy);
+  box-shadow: inset 0 0 0 3px var(--paper);
+}
+
+/* Wyniki zbiorcze — pojawiają się po zagłosowaniu */
+.poll-option__label {
+  flex: 1;
+}
+.poll-option__result {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-width: 6rem;
+  flex-shrink: 0;
+}
+.poll-option__bar {
+  display: block;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--ink-soft);
+  transition: width 0.6s var(--ease);
+  flex: 1;
+  min-width: 0;
+}
+.poll-option--active .poll-option__bar {
+  background: var(--navy);
+}
+.poll-option__pct {
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.poll-option--active .poll-option__pct {
+  color: var(--navy);
+  font-weight: 600;
+}
+
+/* — SEKCJA 01: Hero — kinowa skala, editorial left-align (DESIGN.md §4) — */
+.hero {
+  overflow: hidden; /* trzyma radialny wash w obrębie hero */
+}
+
+/* Tło hero: warstwa dekoracyjna pod treścią (z-index < .hero__inner) */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+/* Radialny ciepły wash — granat/oliwka/koral muśnięte w rogach, bardzo subtelnie.
+   Niska krycie → nie zaniża kontrastu H1 (grafit na papierze). */
+.hero__wash {
+  position: absolute;
+  inset: -10% -5% -20%;
+  background:
+    radial-gradient(
+      42% 50% at 82% 18%,
+      color-mix(in srgb, var(--navy) 16%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      46% 55% at 6% 92%,
+      color-mix(in srgb, var(--olive) 15%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      34% 42% at 96% 96%,
+      color-mix(in srgb, var(--coral) 12%, transparent) 0%,
+      transparent 72%
+    );
+  filter: blur(8px);
+  opacity: 0.9;
+  animation: hero-drift 22s var(--ease-soft) infinite alternate;
+}
+/* Cienka archiwalna siatka — gasnąca ku dołowi (charakter dossier) */
+.hero__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--hairline) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hairline) 1px, transparent 1px);
+  background-size: clamp(56px, 7vw, 96px) clamp(56px, 7vw, 96px);
+  opacity: 0.4;
+  -webkit-mask-image: radial-gradient(
+    120% 90% at 30% 0%,
+    #000 0%,
+    transparent 75%
+  );
+  mask-image: radial-gradient(120% 90% at 30% 0%, #000 0%, transparent 75%);
+}
+@keyframes hero-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-2.5%, 1.5%, 0) scale(1.06);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__wash {
+    animation: none;
+  }
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.4rem, 3.2vw, 2.4rem);
+  padding-block: clamp(3.5rem, 10vh, 7rem);
+}
+.hero__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .hero__body {
+    grid-template-columns: 1fr;
+  }
+}
+.hero__left {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.2rem, 2.8vw, 2rem);
+}
+.hero__right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  position: sticky;
+  top: 2rem;
+}
+.hero__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: clamp(0.5rem, 2vw, 1.4rem);
+}
+.hero__top .shell__eyebrow {
+  margin-bottom: 0;
+}
+.hero__meter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 180px;
+  flex: 0 1 230px;
+}
+/* H1 behemot: szeroki kontener + większa skala → 2–3 linie (DESIGN.md §3, §4).
+   Kontener celowo szeroki, by długie polskie słowa płynęły poziomo. */
+.hero__title {
+  max-width: 100%;
+  font-size: clamp(2.5rem, 6.4vw, 4.1rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+.hero__lead {
+  max-width: 52ch;
+  font-size: var(--step-lead);
+}
+.hero__poll {
+  max-width: 560px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.6rem;
+}
+.hero__poll-q {
+  font-weight: 600;
+  font-size: 1.08rem;
+}
+.hero__poll-options {
+  display: grid;
+  gap: 0.6rem;
+}
+/* Opcje sondażu sygnowane akcentem semantycznym dopiero w hero (nie ruszamy
+   współdzielonej .poll-option, której używa też Sekcja 10). */
+.hero__poll .poll-option--active {
+  border-color: var(--navy);
+}
+.hero__poll-saved {
+  font-size: var(--step-caption);
+  color: var(--olive);
+  font-weight: 600;
+}
+.hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9em;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  width: fit-content;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+  border: 1px solid var(--hairline);
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-sm), var(--hi-inset);
+  transition:
+    transform 0.5s var(--ease),
+    box-shadow 0.5s var(--ease),
+    border-color 0.4s var(--ease);
+}
+.hero__cta:hover {
+  transform: translateY(-3px);
+  border-color: var(--ink);
+  box-shadow: var(--shadow-md);
+}
+.hero__cta:active {
+  transform: scale(0.98);
+}
+.hero__cta-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 99px;
+  background: var(--ink);
+  color: var(--paper);
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  transition: transform 0.6s var(--ease);
+  animation: nudge 2s var(--ease-soft) infinite;
+}
+.hero__cta:hover .hero__cta-icon {
+  transform: translateY(3px);
+}
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__cta-icon {
+    animation: none;
+  }
+}
+
+/* — Wykres wyników sondażu (hero__right) — */
+.hero__chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  padding: clamp(1.4rem, 3vw, 2rem);
+}
+.hero__chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.hero__chart-eyebrow {
+  margin: 0;
+  font-size: var(--step-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+.hero__chart-count {
+  font-size: var(--step-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.hero__chart-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.hero__chart-empty {
+  font-size: var(--step-caption);
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+/* Pojedynczy wiersz wykresu */
+.chart-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.chart-bar__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.chart-bar__label {
+  font-size: 0.88rem;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.chart-bar__pct {
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.chart-bar__track {
+  height: 6px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  overflow: hidden;
+}
+.chart-bar__fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--ink-soft);
+  transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.chart-bar--leading .chart-bar__label {
+  font-weight: 700;
+  color: var(--navy);
+}
+.chart-bar--leading .chart-bar__pct {
+  color: var(--navy);
+  font-weight: 600;
+}
+.chart-bar--leading .chart-bar__fill {
+  background: var(--navy);
+}
+.chart-bar--mine .chart-bar__track {
+  background: color-mix(in srgb, var(--olive) 15%, transparent);
+}
+.chart-bar--mine:not(.chart-bar--leading) .chart-bar__fill {
+  background: var(--olive);
+}
+.chart-bar--mine .chart-bar__label::after {
+  content: " ↩";
+  font-size: 0.75em;
+  opacity: 0.6;
+}
+
+/* — SEKCJA 02: Why — */
+.why__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.9rem;
+}
+.why__card {
+  padding: 0;
+  overflow: hidden;
+  transition:
+    border-color 0.4s var(--ease),
+    transform 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+.why__card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.why__card--open {
+  border-color: var(--ink);
+  grid-column: span 1;
+}
+.why__card-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 1.1rem 1.3rem;
+  text-align: left;
+}
+.why__card-label {
+  font-weight: 600;
+  font-size: 1.02rem;
+  line-height: 1.25;
+}
+.why__card-sign {
+  font-size: 1.4rem;
+  color: var(--coral);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.why__card-note {
+  padding: 0 1.3rem 1.2rem;
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+}
+
+/* — SEKCJA 03: Law — */
+.law__compare {
+  position: relative;
+  display: grid;
+  border: 1.5px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--paper-2);
+}
+.law__pane {
+  grid-area: 1 / 1;
+  width: 100%;
+}
+.law__pane--after {
+  background: var(--paper);
+}
+.law__col {
+  padding: clamp(1.4rem, 3vw, 2.2rem);
+}
+.law__col-title {
+  color: var(--col-accent);
+  margin-bottom: 1rem;
+}
+.law__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.law__list li {
+  padding-left: 1.3em;
+  position: relative;
+  color: var(--ink);
+}
+.law__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 7px;
+  height: 7px;
+  border-radius: 99px;
+  background: var(--col-accent);
+}
+.law__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--navy);
+  transform: translateX(-1px);
+  pointer-events: none;
+}
+.law__handle-grip {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--navy);
+  color: var(--paper);
+  width: 30px;
+  height: 30px;
+  border-radius: 99px;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+}
+.law__slider-label {
+  display: block;
+  margin-top: 1rem;
+}
+.law__slider {
+  width: 100%;
+}
+.law__note {
+  margin-top: 1.5rem;
+  font-size: var(--step-quote);
+  max-width: 52ch;
+  color: var(--ink);
+}
+
+/* — SEKCJA 04: Problem (dark) — */
+.problem__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+}
+.problem__sticky {
+  position: sticky;
+  top: 12vh;
+}
+.problem__core {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  color: var(--coral);
+  margin-top: 1rem;
+  font-weight: 600;
+}
+.problem__steps {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vw, 3.5rem);
+}
+.problem__step {
+  border-top: 1px solid #3a3a30;
+  padding-top: 1.4rem;
+}
+.problem__q {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 600;
+  color: var(--on-ink);
+  display: flex;
+  gap: 0.6em;
+  margin-bottom: 0.8rem;
+  line-height: 1.15;
+}
+.problem__q-mark {
+  color: var(--coral);
+  flex-shrink: 0;
+}
+.problem__a {
+  color: var(--on-ink-soft);
+  max-width: 52ch;
+}
+
+/* — SEKCJA 05: Models — */
+.models__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.8rem;
+}
+.models__split {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  align-items: stretch;
+}
+.models__col {
+  border-top: 4px solid var(--m-accent);
+  padding-top: 1.2rem;
+}
+.models__tag {
+  font-size: var(--step-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--m-accent);
+  font-weight: 700;
+}
+.models__name {
+  margin: 0.4rem 0 1.2rem;
+}
+.models__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.models__list li {
+  padding-left: 1.3em;
+  position: relative;
+  color: var(--ink);
+}
+.models__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 7px;
+  height: 7px;
+  border-radius: 99px;
+  background: var(--m-accent);
+}
+.models__divider {
+  align-self: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 1.2rem;
+}
+.models__note {
+  margin-top: 2rem;
+  font-size: var(--step-quote);
+  max-width: 54ch;
+}
+
+/* — SEKCJA 06: When (timeline) — */
+.when__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+}
+.when__timeline {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-left: 0.5rem;
+}
+.when__timeline::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 18px;
+  bottom: 18px;
+  width: 2px;
+  background: var(--hairline);
+}
+.when__progress {
+  position: absolute;
+  left: 14px;
+  top: 18px;
+  bottom: 18px;
+  width: 2px;
+  background: linear-gradient(var(--navy), var(--olive));
+  transform-origin: top center;
+  transform: scaleY(0);
+  z-index: 0;
+}
+.when__node {
+  position: relative;
+}
+.when__dot {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0.7rem 0.5rem;
+  text-align: left;
+}
+.when__dot-mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 99px;
+  border: 2px solid var(--ink-soft);
+  background: var(--paper-2);
+  flex-shrink: 0;
+  z-index: 1;
+  transition: all 0.2s var(--ease);
+}
+.when__dot-label {
+  font-weight: 600;
+  color: var(--ink-soft);
+  transition: color 0.2s var(--ease);
+}
+.when__dot--active .when__dot-mark {
+  border-color: var(--navy);
+  background: var(--navy);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--navy) 20%, transparent);
+}
+.when__dot--active .when__dot-label {
+  color: var(--ink);
+}
+.when__panel {
+  position: sticky;
+  top: 10vh;
+}
+.when__panel-title {
+  margin-bottom: 1.2rem;
+  color: var(--navy);
+}
+.when__panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin: 0;
+}
+.when__field dt {
+  font-size: var(--step-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
+}
+.when__field dd {
+  margin: 0;
+  font-size: 0.96rem;
+}
+.when__field--good dt {
+  color: var(--olive);
+}
+.when__field--risk dt {
+  color: var(--coral);
+}
+.when__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.when__tools li {
+  font-size: 0.82rem;
+  border: 1px solid var(--hairline);
+  border-radius: 99px;
+  padding: 0.25em 0.7em;
+}
+
+/* — SEKCJA 07: Tools — */
+.tools__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+.tools__clear {
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  padding: 0.4em;
+}
+.tools__count {
+  font-size: var(--step-caption);
+  color: var(--ink-soft);
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+.tools__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.tools__card {
+  transition:
+    transform 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+.tools__card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.tools__name {
+  margin-bottom: 0.6rem;
+}
+.tools__desc {
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+  margin-bottom: 1rem;
+}
+.tools__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.tools__tags li {
+  font-size: 0.76rem;
+  background: var(--paper-2);
+  border-radius: 99px;
+  padding: 0.25em 0.7em;
+  color: var(--ink-soft);
+}
+
+/* — SEKCJA 08: Facade — */
+.facade__quiz {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  margin-bottom: clamp(2.5rem, 6vw, 4rem);
+}
+.facade__scenario {
+  font-size: 1.02rem;
+  margin-bottom: 1.2rem;
+}
+.facade__choices {
+  display: flex;
+  gap: 0.6rem;
+}
+.facade__choice {
+  flex: 1;
+  padding: 0.7em 0.9em;
+  border: 1.5px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: all 0.18s var(--ease);
+}
+.facade__choice:not(:disabled):hover {
+  border-color: var(--ink);
+}
+.facade__choice--picked {
+  border-color: var(--ink);
+  background: var(--paper-2);
+}
+.facade__choice--answer {
+  border-color: var(--olive);
+  background: color-mix(in srgb, var(--olive) 12%, var(--paper));
+  color: var(--olive);
+}
+.facade__feedback {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--hairline);
+  font-size: 0.94rem;
+}
+.facade__verdict {
+  margin-bottom: 0.4rem;
+}
+.facade__feedback.is-correct .facade__verdict strong {
+  color: var(--olive);
+}
+.facade__feedback.is-wrong .facade__verdict strong {
+  color: var(--coral);
+}
+.facade__explain {
+  color: var(--ink-soft);
+}
+.facade__signals {
+  border-left: 4px solid var(--coral);
+  padding-left: clamp(1rem, 3vw, 2rem);
+}
+.facade__signals-title {
+  color: var(--coral);
+  margin-bottom: 1.2rem;
+}
+.facade__signals-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.8rem 1.5rem;
+}
+.facade__signals-list li {
+  display: flex;
+  gap: 0.7em;
+  color: var(--ink);
+  font-size: 0.96rem;
+}
+.facade__signal-mark {
+  color: var(--coral);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* — SEKCJA 09: Ratio — */
+.ratio__panel {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  background: var(--paper-2);
+  border: 1.5px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  max-width: 760px;
+}
+.ratio__sliders {
+  display: grid;
+  gap: 1.3rem;
+}
+.ratio__slider-row {
+  display: grid;
+  gap: 0.5rem;
+}
+.ratio__slider-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-weight: 600;
+}
+.ratio__dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 99px;
+}
+.ratio__val {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+.ratio__slider {
+  width: 100%;
+  accent-color: var(--r-accent);
+}
+.ratio__comment {
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius-lg);
+  font-size: 1.02rem;
+  line-height: 1.5;
+  border-left: 4px solid var(--ink-soft);
+  background: var(--paper);
+}
+.ratio__comment--warn {
+  border-left-color: var(--coral);
+}
+.ratio__comment--balanced {
+  border-left-color: var(--olive);
+}
+.ratio__thesis {
+  margin-top: 2rem;
+  font-size: var(--step-quote);
+  max-width: 54ch;
+}
+
+/* — SEKCJA 10: Return — */
+.return__inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.2rem, 3vw, 1.8rem);
+  padding-block: clamp(3rem, 8vh, 6rem);
+}
+.return__recall {
+  max-width: 560px;
+}
+.return__recall-q {
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.return__recall-a {
+  color: var(--ink-soft);
+}
+.return__recall-a strong {
+  color: var(--navy);
+}
+.return__poll {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  max-width: 560px;
+}
+.return__poll-q {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+.return__poll-options {
+  display: grid;
+  gap: 0.6rem;
+}
+.return__punchline {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-size: var(--step-quote);
+  line-height: 1.4;
+  max-width: 40ch;
+  margin-top: 1.5rem;
+  color: var(--ink);
+}
+
+/* — Scrub tekstu: słowa rozjaśniane scrollem — */
+.scrub__word {
+  display: inline;
+}
+
+/* — Responsywność — */
+@media (max-width: 860px) {
+  .problem__layout,
+  .when__layout,
+  .models__split {
+    grid-template-columns: 1fr;
+  }
+  .problem__sticky,
+  .when__panel {
+    position: static;
+  }
+  .models__split {
+    gap: 1.5rem;
+  }
+  .models__divider {
+    justify-self: start;
+  }
+  .when__panel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .law__compare {
+    /* na wąskich ekranach pokaż obie kolumny pod sobą zamiast wipe */
+    background: var(--paper);
+  }
+  .law__pane {
+    grid-area: auto;
+  }
+  .law__pane--after {
+    clip-path: none !important;
+    border-top: 1.5px solid var(--hairline);
+  }
+  .law__handle {
+    display: none;
+  }
+  .law__slider-label {
+    display: none;
+  }
+  .facade__choices {
+    flex-direction: column;
+  }
+}
