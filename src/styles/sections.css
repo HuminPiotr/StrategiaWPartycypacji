@@ -128,6 +128,13 @@
   color: var(--navy);
   font-weight: 600;
 }
+.poll-option--locked {
+  cursor: default;
+  opacity: 0.85;
+}
+.poll-option--locked:not(.poll-option--active) {
+  opacity: 0.55;
+}
 
 /* — SEKCJA 01: Hero — kinowa skala, editorial left-align (DESIGN.md §4) — */
 .hero {
@@ -1072,13 +1079,38 @@
 /* Rozbieg scrolla pod treścią: scrub puenty potrzebuje miejsca, by dojechać
    do końca na każdej wysokości ekranu (sekcja jest ostatnia przed footerem). */
 .return-section {
-  padding-bottom: clamp(5rem, 28vh, 16rem);
+  padding-bottom: clamp(12rem, 60vh, 40rem);
 }
 .return__inner {
   display: flex;
   flex-direction: column;
   gap: clamp(1.2rem, 3vw, 1.8rem);
   padding-block: clamp(3rem, 8vh, 6rem);
+}
+/* Treść | wykres obok siebie. Puenta (ScrubText) zostaje POZA gridem, pełną
+   szerokością na dole — by nie ruszać rozbiegu scrubu skalibrowanego wcześniej. */
+.return__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+}
+.return__main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.2rem, 3vw, 1.8rem);
+}
+.return__aside {
+  display: flex;
+  justify-content: center;
+}
+@media (max-width: 860px) {
+  .return__grid {
+    grid-template-columns: 1fr;
+  }
+  .return__aside {
+    order: 2; /* wykres pod sondażem na wąskich ekranach */
+  }
 }
 .return__recall {
   max-width: 560px;
@@ -1118,6 +1150,134 @@
   max-width: 40ch;
   margin-top: 1.5rem;
   color: var(--ink);
+}
+
+/* — Wykres kołowy 3D (rozkład głosów) — */
+.donut3d {
+  /* ciepły, ciemny bok ekstruzji — jednolity (nie per-segment) dla spokoju editorial */
+  --donut-side: #423d35;
+  display: grid;
+  justify-items: center;
+  gap: clamp(1.3rem, 3vw, 1.9rem);
+  margin: 0;
+  perspective: 1000px;
+}
+.donut3d__stage {
+  width: clamp(190px, 24vw, 250px);
+  aspect-ratio: 1;
+  transform-style: preserve-3d;
+  transform: rotateX(56deg) rotateZ(-14deg);
+  opacity: 0;
+}
+.donut3d--visible .donut3d__stage {
+  animation: donut-in 1s var(--ease-out-expo) both;
+}
+.donut3d__disc {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  /* Grubość: drabinka jednolitych krążków (po pochyleniu czyta się jako bok),
+     a na końcu miękki cień kontaktowy. */
+  box-shadow:
+    0 1px 0 var(--donut-side), 0 2px 0 var(--donut-side), 0 3px 0 var(--donut-side),
+    0 4px 0 var(--donut-side), 0 5px 0 var(--donut-side), 0 6px 0 var(--donut-side),
+    0 7px 0 var(--donut-side), 0 8px 0 var(--donut-side), 0 9px 0 var(--donut-side),
+    0 10px 0 var(--donut-side), 0 11px 0 var(--donut-side), 0 12px 0 var(--donut-side),
+    0 13px 0 var(--donut-side), 0 14px 0 var(--donut-side), 0 15px 0 var(--donut-side),
+    0 16px 0 var(--donut-side), 0 17px 0 var(--donut-side), 0 18px 0 var(--donut-side),
+    0 26px 34px -8px rgba(28, 28, 26, 0.45);
+}
+/* Warstwa odsłony: zakrywa jeszcze nieodsłonięty łuk kolorem toru (hairline).
+   Zegarowy sweep napędza inline `--sweep` (tło ustawiane w komponencie). */
+.donut3d__wipe {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+/* Połysk — subtelne światło z górnego-lewego rogu */
+.donut3d__sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    120% 120% at 28% 22%,
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0) 55%
+  );
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+/* Dziura: nieprzezroczysty krążek papieru z lekkim cieniem wewnętrznym (recess) */
+.donut3d__hole {
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow:
+    inset 0 2px 8px rgba(28, 28, 26, 0.22),
+    0 0 0 1px color-mix(in srgb, var(--ink) 6%, transparent);
+  transform: translateZ(0.5px);
+}
+.donut3d__caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  text-align: center;
+}
+.donut3d__caption-num {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  line-height: 1;
+  color: var(--ink-soft);
+}
+.donut3d__caption-label {
+  font-size: var(--step-caption);
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+.donut3d__legend {
+  display: grid;
+  gap: 0.55rem;
+  width: 100%;
+  max-width: 320px;
+}
+.donut3d__legend li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.donut3d__dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 99px;
+}
+.donut3d__legend-pct {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+@keyframes donut-in {
+  from {
+    opacity: 0;
+    transform: rotateX(74deg) rotateZ(-14deg) scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: rotateX(56deg) rotateZ(-14deg) scale(1) translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .donut3d--visible .donut3d__stage {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 /* — Scrub tekstu: słowa rozjaśniane scrollem — */

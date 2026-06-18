@@ -1,15 +1,33 @@
+import { useState } from "react";
 import { meta, poll, sections } from "../data/content.js";
 import TensionMeter from "../components/TensionMeter.jsx";
 import { useReveal } from "../hooks/useReveal.js";
-import { useVoteResults } from "../hooks/useSurveyResults.js";
+import { useVoteResults, submitVote } from "../hooks/useSurveyResults.js";
+import { usePersistedAnswer } from "../hooks/usePersistedAnswer.js";
 
 const s = sections[0];
 
 export default function Hero() {
   const ref = useReveal({ y: 20, stagger: 0.07, blur: 0, duration: 0.6 });
-  const { results, total } = useVoteResults();
+  const { results, total, refetch } = useVoteResults();
+  const [answer, setAnswer] = usePersistedAnswer("strategia.poll.answer", null);
+  const [locked] = usePersistedAnswer("strategia.poll.locked", false);
+  const [submitError, setSubmitError] = useState(null);
+
   const maxCount =
     total > 0 ? Math.max(...poll.options.map((o) => results[o.id] || 0)) : 0;
+
+  const handleVote = async (id) => {
+    if (locked) return;
+    setSubmitError(null);
+    try {
+      await submitVote(id);
+      setAnswer(id);
+      refetch();
+    } catch (err) {
+      setSubmitError(err?.message ?? "Błąd zapisu — spróbuj ponownie.");
+    }
+  };
 
   return (
     <section
@@ -57,59 +75,112 @@ export default function Hero() {
           </div>
 
           <div className="hero__right" data-reveal>
-            <div
-              className="hero__chart card"
-              aria-label="Wyniki głosowania odwiedzających"
-            >
+            <div className="hero__chart card" aria-label="Głosowanie odwiedzających">
               <div className="hero__chart-header">
-                <p className="eyebrow hero__chart-eyebrow">
-                  Co sądzą odwiedzający
-                </p>
-                <span className="hero__chart-count">
-                  {total > 0
-                    ? `${total} głos${total === 1 ? "" : total < 5 ? "y" : "ów"}`
-                    : "brak głosów"}
-                </span>
+                <p className="eyebrow hero__chart-eyebrow">Co sądzą odwiedzający</p>
+                <p>{poll.question}</p>
+                {answer && total > 0 && (
+                  <span className="hero__chart-count">
+                    {total} głos{total === 1 ? "" : total < 5 ? "y" : "ów"}
+                  </span>
+                )}
               </div>
 
-              <div className="hero__chart-bars">
-                {poll.options.map((opt) => {
-                  const count = results[opt.id] || 0;
-                  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-                  const isLeading =
-                    total > 0 && count === maxCount && count > 0;
-
-                  return (
-                    <div
-                      key={opt.id}
-                      className={`chart-bar ${isLeading ? "chart-bar--leading" : ""}`}
-                    >
-                      <div className="chart-bar__meta">
-                        <span className="chart-bar__label">{opt.label}</span>
-                        <span className="chart-bar__pct">
-                          {total > 0 ? `${pct}%` : "—"}
-                        </span>
-                      </div>
+              {/* Wyniki (tryb po zablokowaniu) */}
+              {locked && (
+                <div className="hero__chart-bars">
+                  {poll.options.map((opt) => {
+                    const count = results[opt.id] || 0;
+                    const pct =
+                      total > 0 ? Math.round((count / total) * 100) : 0;
+                    const isLeading =
+                      total > 0 && count === maxCount && count > 0;
+                    const isOwn = answer === opt.id;
+                    return (
                       <div
-                        className="chart-bar__track"
-                        role="progressbar"
-                        aria-valuenow={pct}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
+                        key={opt.id}
+                        className={`chart-bar ${isLeading ? "chart-bar--leading" : ""} ${isOwn ? "chart-bar--mine" : ""}`}
                       >
+                        <div className="chart-bar__meta">
+                          <span className="chart-bar__label">{opt.label}</span>
+                          <span className="chart-bar__pct">
+                            {total > 0 ? `${pct}%` : "—"}
+                          </span>
+                        </div>
                         <div
-                          className="chart-bar__fill"
-                          style={{ width: total > 0 ? `${pct}%` : "0%" }}
-                        />
+                          className="chart-bar__track"
+                          role="progressbar"
+                          aria-valuenow={pct}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        >
+                          <div
+                            className="chart-bar__fill"
+                            style={{ width: total > 0 ? `${pct}%` : "0%" }}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
 
-              {total === 0 && (
+              {/* Formularz głosowania (przed zablokowaniem) */}
+              {!locked && (
+                <div
+                  className="hero__poll"
+                  role="radiogroup"
+                  aria-label={poll.question}
+                >
+                  {poll.options.map((opt) => {
+                    const active = answer === opt.id;
+                    const pct =
+                      answer && total > 0
+                        ? Math.round(((results[opt.id] || 0) / total) * 100)
+                        : 0;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        className={`poll-option ${active ? "poll-option--active" : ""}`}
+                        onClick={() => handleVote(opt.id)}
+                      >
+                        <span className="poll-option__dot" aria-hidden="true" />
+                        <span className="poll-option__label">{opt.label}</span>
+                        {answer && total > 0 && (
+                          <span
+                            className="poll-option__result"
+                            aria-label={`${pct}%`}
+                          >
+                            <span
+                              className="poll-option__bar"
+                              style={{ width: `${pct}%` }}
+                              aria-hidden="true"
+                            />
+                            <span className="poll-option__pct">{pct}%</span>
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {!answer && !locked && (
                 <p className="hero__chart-empty">
-                  Zagłosuj na końcu strony — wyniki pojawią się tu od razu.
+                  Zagłosuj — wyniki pokażą się od razu.
+                </p>
+              )}
+              {answer && !locked && (
+                <p className="hero__poll-saved" role="status">
+                  Wstępny głos zapisany. Możesz zmienić zdanie na końcu strony.
+                </p>
+              )}
+              {submitError && (
+                <p className="return__error" role="alert">
+                  {submitError}
                 </p>
               )}
             </div>

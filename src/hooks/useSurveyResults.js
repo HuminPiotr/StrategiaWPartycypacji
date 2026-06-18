@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
+import { getSessionId } from '../lib/session.js'
 
 export async function submitVote(answer) {
-  const { error } = await supabase.from('votes').insert({ answer })
+  const { error } = await supabase
+    .from('votes')
+    .upsert({ answer, session_id: getSessionId() }, { onConflict: 'session_id' })
   if (error) throw error
 }
 
